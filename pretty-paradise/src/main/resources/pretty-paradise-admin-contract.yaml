@@ -1,0 +1,125 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Pretty Paradise
+  description: ''
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://localhost:8000
+    
+tags: 
+ - name: admin
+   description: Admin related operations
+   
+paths:
+  /products:
+    post:
+      tags: 
+        - admin
+      summary: Create a new product.
+      operationId: createNewProduct
+      requestBody:
+       content:
+         application/json:
+          schema: 
+            $ref: '#/components/schemas/Product'
+          
+      
+      responses:
+        "201":
+         description: New product created.
+         content:
+           application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+        "500":
+          description: error occurred - see status code and problem object for more information.
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'https://opensource.zalando.com/problem/schema.yaml#/Problem'
+    
+    get:
+      tags: 
+        - admin
+      summary: Retrieves all products.
+      operationId: retrieveAllProducts
+      responses:
+        "200":
+          description: All products retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Products"
+        "500":
+          description: error occurred - see status code and problem object for more information.
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'https://opensource.zalando.com/problem/schema.yaml#/Problem'
+                
+  /products/{productId}:
+    parameters: 
+      - name: productId
+        in: path
+        description: Product ID whose details need to be updated.
+        required: true
+        schema:
+          type: integer
+          format: int64
+    put:
+      tags:
+        - admin
+      summary: Edit the Product with the specified Product ID and the provided content in the body.
+      operationId: editProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        '200': 
+          description: Product successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+    delete:
+      tags: 
+      - admin
+      summary: Delete the Product with the specified Product ID.
+      operationId: deleteProduct
+      responses:
+        "200":
+          description: Product successfully deleted.
+        "500":
+          description: error occurred - see status code and problem object for more information.
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'https://opensource.zalando.com/problem/schema.yaml#/Problem'
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+       - name
+       - price
+       - image
+      properties:
+        name:
+          type: string
+          example: "grey and glitter"
+        price:
+          type: number
+          format: double
+          example: '30.00'
+        image:
+          type: string
+          format: binary
+    Products:
+      type: array
+      items:
+        $ref: "#/components/schemas/Product"
