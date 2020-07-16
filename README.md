@@ -1,1 +1,1 @@
-# prettyparadise
+# Pretty Paradise Admin
