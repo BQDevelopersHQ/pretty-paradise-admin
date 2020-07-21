@@ -25,28 +25,33 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
-        <!-- 3rd party -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- 3rd Party -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-annotations</artifactId>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.swagger.parser.v3</groupId>
-            <artifactId>swagger-parser</artifactId>
+            <groupId>com.ninja-squad</groupId>
+            <artifactId>DbSetup</artifactId>
+            <version>2.1.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>jackson-databind-nullable</artifactId>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+            <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
-        </dependency>
+
 
         <!-- Testing -->
         <dependency>
@@ -74,34 +79,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
-            </plugin>
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>admin-api</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <generatorName>spring</generatorName>
-                            <inputSpec>${project.basedir}/src/main/resources/api/pretty-paradise-admin-contract.yaml</inputSpec>
-                            <configOptions>
-                                <sourceFolder>src/main/java</sourceFolder>
-                                <java8>true</java8>
-                                <dateLibrary>java8</dateLibrary>
-                                <library>spring-boot</library>
-                                <useOptional>true</useOptional>
-                                <serializationLibrary>jackson</serializationLibrary>
-                                <generateSupportingFiles>true</generateSupportingFiles>
-                                <apiPackage>${pretty-paradise-admin.package.api}</apiPackage>
-                                <modelPackage>${pretty-paradise-admin.package.api}.model</modelPackage>
-                                <interfaceOnly>true</interfaceOnly>
-                            </configOptions>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
