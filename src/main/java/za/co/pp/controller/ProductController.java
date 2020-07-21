@@ -2,7 +2,9 @@ package za.co.pp.controller;
 
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,7 +15,8 @@ import za.co.pp.data.dto.Product;
 public interface ProductController {
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
-    public ResponseEntity<Product> createNewProduct(@RequestParam Map<String, String> productDetails, @RequestPart(value = "files") MultipartFile image);
-
+    default ResponseEntity<Product> createNewProduct(@RequestParam MultiValueMap<String, String> productDetails, @RequestPart MultipartFile image) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
 
 }
