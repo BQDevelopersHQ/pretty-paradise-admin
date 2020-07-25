@@ -1,7 +1,6 @@
 package za.co.pp.data.mapper;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -11,12 +10,10 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.sax.BodyContentHandler;
 import org.mapstruct.Named;
-import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.mock.web.MockMultipartFile;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 @Component
 public class MultipartFileMapper {
@@ -36,6 +33,5 @@ public class MultipartFileMapper {
         tika.getParser().parse(inputStream, bodyContentHandler, metadata, parseContext);
         return new MockMultipartFile("product_image", "", metadata.get("Content-Type"), inputStream);
     }
-
 
 }
