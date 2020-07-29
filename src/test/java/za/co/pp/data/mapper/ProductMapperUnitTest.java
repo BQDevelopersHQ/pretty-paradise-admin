@@ -26,7 +26,7 @@ class ProductMapperUnitTest {
     private ProductMapper productMapper;
 
     @Test
-    void canMapFromDomainToDto() throws IOException {
+    void canMapFromDomainToDto() throws Exception {
         ProductDomainObject productDomainObject = createProductDomainObject();
 
         Product productDto = productMapper.domainToDto(productDomainObject);
@@ -35,12 +35,13 @@ class ProductMapperUnitTest {
     }
 
     @Test
-    void canMapFromDtoToDomainObject() throws IOException {
+    void canMapFromDtoToDomainObject() throws Exception {
         Product productDto = createProductDto();
 
         ProductDomainObject productDomainObject = productMapper.dtoToDomainObject(productDto);
 
         assertDtoAndDomainObjectMapping(productDto, productDomainObject);
+        assertThat(productDomainObject.getImage()).isNotEmpty();
     }
 
     @Test
@@ -74,11 +75,7 @@ class ProductMapperUnitTest {
         assertThat(productDomainObject.getId()).isEqualTo(productEntity.getId());
         assertThat(productDomainObject.getName()).isEqualTo(productEntity.getName());
         assertThat(productDomainObject.getPrice()).isEqualTo(productEntity.getPrice());
-        assertThat(getByteArrayFromMultipartFile(productDomainObject)).isEqualTo(productEntity.getImage());
-    }
-
-    private byte[] getByteArrayFromMultipartFile(ProductDomainObject productDomainObject) throws IOException {
-        return productDomainObject.getImage().getBytes();
+        assertThat(productDomainObject.getImage()).isEqualTo(productEntity.getImage());
     }
 
     private byte[] createByteImage() throws Exception {
@@ -96,13 +93,14 @@ class ProductMapperUnitTest {
         return productDto;
     }
 
-    private ProductDomainObject createProductDomainObject() throws IOException {
+    private ProductDomainObject createProductDomainObject() throws Exception {
         ProductDomainObject productDomainObject = new ProductDomainObject();
         productDomainObject.setId(1L);
         productDomainObject.setName("Gray and Glitter");
         productDomainObject.setPrice(20.00);
 
-        productDomainObject.setImage(createMultipartFile());
+        InputStream fileInputStream = new FileInputStream(ResourceUtils.getFile("classpath:images/test_image.jpeg"));
+        productDomainObject.setImage(IOUtils.toByteArray(fileInputStream));
         return productDomainObject;
     }
 
@@ -113,12 +111,11 @@ class ProductMapperUnitTest {
 
     }
 
-    private void assertDtoAndDomainObjectMapping(final Product productDto, final ProductDomainObject productDomainObject) {
+    private void assertDtoAndDomainObjectMapping(final Product productDto, final ProductDomainObject productDomainObject) throws Exception{
         assertThat(productDto.getId()).isEqualTo(productDomainObject.getId());
         assertThat(productDto.getId()).isEqualTo(productDomainObject.getId());
         assertThat(productDto.getName()).isEqualTo(productDomainObject.getName());
         assertThat(productDto.getPrice()).isEqualTo(productDomainObject.getPrice());
-        assertThat(productDto.getImage()).isEqualTo(productDomainObject.getImage());
     }
 
 }

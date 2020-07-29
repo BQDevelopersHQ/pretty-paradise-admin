@@ -10,14 +10,13 @@ import za.co.pp.data.entity.ProductEntity;
 @Mapper(componentModel = "spring", uses = {MultipartFileMapper.class})
 @Component
 public interface ProductMapper {
-
+    @Mapping(target = "image", ignore = true)
     Product domainToDto(ProductDomainObject productDomainObject);
 
+    @Mapping(source = "image", target = "image", qualifiedByName = "multipartFleToByteArray")
     ProductDomainObject dtoToDomainObject(Product productDto);
 
-    @Mapping(source = "image", target = "image", qualifiedByName = "byteArrayToMultipartFile")
-    ProductDomainObject entityToDomainObject(ProductEntity productEntity);
-
-    @Mapping(source = "image", target = "image", qualifiedByName = "multipartFleToByteArray")
     ProductEntity domainObjectToEntity(ProductDomainObject productDomainObject);
+
+    ProductDomainObject entityToDomainObject(ProductEntity savedProductEntity);
 }

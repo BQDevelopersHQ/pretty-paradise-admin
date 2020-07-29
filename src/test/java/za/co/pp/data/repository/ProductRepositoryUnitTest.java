@@ -2,15 +2,13 @@ package za.co.pp.data.repository;
 
 import javax.sql.DataSource;
 import java.io.FileInputStream;
-
-import com.ninja_squad.dbsetup.DbSetup;
-import com.ninja_squad.dbsetup.Operations;
-import com.ninja_squad.dbsetup.destination.DataSourceDestination;
-import com.ninja_squad.dbsetup.operation.Operation;
-import org.apache.commons.io.IOUtils;
 import java.io.InputStream;
 import java.util.Optional;
 
+import com.ninja_squad.dbsetup.DbSetup;
+import com.ninja_squad.dbsetup.destination.DataSourceDestination;
+import com.ninja_squad.dbsetup.operation.Operation;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +32,7 @@ public class ProductRepositoryUnitTest {
     private DataSource dataSource;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         Operation operations = sequenceOf(
                 DROP_SCHEMA,
                 CREATE_SCHEMA,

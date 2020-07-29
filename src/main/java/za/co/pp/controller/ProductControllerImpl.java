@@ -1,8 +1,42 @@
 package za.co.pp.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import za.co.pp.controller.validation.ProductValidation;
+import za.co.pp.data.domain.ProductDomainObject;
+import za.co.pp.data.dto.Product;
+import za.co.pp.data.mapper.ProductMapper;
+import za.co.pp.service.ProductService;
 
 @RestController
 public class ProductControllerImpl implements ProductController {
+
+    private final ProductMapper productMapper;
+
+    private final ProductService productService;
+
+    @Autowired
+    public ProductControllerImpl(ProductMapper productMapper, ProductService productService) {
+        this.productService = productService;
+        this.productMapper = productMapper;
+    }
+
+    @Override
+    public ResponseEntity<Product> createNewProduct(final MultiValueMap<String, String> productDetails, final MultipartFile image) {
+        final Product productDto = new Product();
+        productDto.setName(productDetails.get("name").get(0));
+        productDto.setPrice(Double.parseDouble(productDetails.get("price").get(0)));
+        productDto.setImage(image);
+
+        ProductValidation.validateProduct(productDto);
+        final ProductDomainObject productDomainObject = productMapper.dtoToDomainObject(productDto);
+
+        final ProductDomainObject savedProductDomainObject = productService.saveProduct(productDomainObject);
+        return new ResponseEntity<>(productMapper.domainToDto(savedProductDomainObject), HttpStatus.CREATED);
+    }
 
 }

@@ -22,7 +22,7 @@ public class ProductValidation {
     }
 
     private static void validateProductImage(final MultipartFile image) {
-        Tika tika = new Tika();
+        final Tika tika = new Tika();
         try {
             String mimeType = tika.detect(image.getBytes());
             if (!ALLOWED_FILE_TYPES.contains(mimeType)) {
