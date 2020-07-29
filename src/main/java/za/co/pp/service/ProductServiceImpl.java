@@ -10,16 +10,21 @@ import za.co.pp.data.repository.ProductRepository;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired
-    private ProductMapper productMapper;
+    private final ProductMapper productMapper;
+
+    private final ProductRepository productRepository;
 
     @Autowired
-    private ProductRepository productRepository;
+    public ProductServiceImpl(final ProductMapper productMapper, final ProductRepository productRepository){
+        this.productMapper = productMapper;
+        this.productRepository = productRepository;
+    }
 
     @Override
     public ProductDomainObject saveProduct(final ProductDomainObject productDomainObject) {
-        ProductEntity productEntity = productMapper.domainObjectToEntity(productDomainObject);
-        ProductEntity savedProductEntity = productRepository.save(productEntity);
+        final ProductEntity productEntity = productMapper.domainObjectToEntity(productDomainObject);
+        final ProductEntity savedProductEntity = productRepository.save(productEntity);
+
         return productMapper.entityToDomainObject(savedProductEntity);
     }
 }

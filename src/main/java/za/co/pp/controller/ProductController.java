@@ -15,7 +15,7 @@ import za.co.pp.data.dto.Product;
 public interface ProductController {
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
-    default ResponseEntity<Product> createNewProduct(@RequestParam MultiValueMap<String, String> productDetails, @RequestPart MultipartFile image) {
+    default ResponseEntity<Product> createNewProduct(@RequestParam final MultiValueMap<String, String> productDetails, @RequestPart final MultipartFile image) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
