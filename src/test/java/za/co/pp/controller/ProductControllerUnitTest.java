@@ -2,10 +2,13 @@ package za.co.pp.controller;
 
 import javax.sql.DataSource;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
+import org.hibernate.dialect.DB2Dialect;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,10 +28,12 @@ import org.springframework.util.ResourceUtils;
 import za.co.pp.data.dto.Product;
 
 import static com.ninja_squad.dbsetup.Operations.sequenceOf;
+import static com.ninja_squad.dbsetup.Operations.sql;
 import static org.assertj.core.api.Assertions.assertThat;
 import static za.co.pp.utils.DbSetupCommonOperations.CREATE_SCHEMA;
 import static za.co.pp.utils.DbSetupCommonOperations.CREATE_TABLE_PRODUCT;
 import static za.co.pp.utils.DbSetupCommonOperations.DROP_SCHEMA;
+import static za.co.pp.utils.DbSetupCommonOperations.INSERT_INTO_PRODUCTS_TABLE;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ProductControllerUnitTest {
@@ -89,6 +94,18 @@ public class ProductControllerUnitTest {
         ResponseEntity<Product> responseEntity = restTemplate.postForEntity("http://localhost:" + port + "/products", entity, Product.class);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    @DisplayName("Given the products table has 2 records, when get method called on /products endpoint, then returned with 2 expected products")
+    public void canGetAllProducts(){
+        DbSetup dbSetup = new DbSetup(new DataSourceDestination(dataSource), INSERT_INTO_PRODUCTS_TABLE);
+        dbSetup.launch();
+
+        ResponseEntity<Object> responseEntity = restTemplate.getForEntity("http://localhost:" + port + "/products", Object.class);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        // add assertions to test the content of the body
     }
 
     private HttpEntity<MultiValueMap<String, Object>> createContentTypeHeader(final MultiValueMap<String, Object> requestBody) {

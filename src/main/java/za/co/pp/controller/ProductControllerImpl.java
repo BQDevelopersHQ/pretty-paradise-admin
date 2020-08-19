@@ -1,9 +1,13 @@
 package za.co.pp.controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import za.co.pp.controller.validation.ProductValidation;
@@ -13,6 +17,7 @@ import za.co.pp.data.mapper.ProductMapper;
 import za.co.pp.service.ProductService;
 
 @RestController
+@CrossOrigin
 public class ProductControllerImpl implements ProductController {
 
     private final ProductMapper productMapper;
@@ -39,4 +44,14 @@ public class ProductControllerImpl implements ProductController {
         return new ResponseEntity<>(productMapper.domainToDto(savedProductDomainObject), HttpStatus.CREATED);
     }
 
+    @Override
+    public ResponseEntity<List<Product>> getAllProducts() {
+        List<ProductDomainObject> productDomainObjects = productService.getAllProducts();
+
+        List<Product> products = productDomainObjects.stream()
+                .map(this.productMapper::domainToDto)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity(products, HttpStatus.OK);
+    }
 }
