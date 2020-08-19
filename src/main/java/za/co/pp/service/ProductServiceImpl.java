@@ -1,8 +1,12 @@
 package za.co.pp.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.co.pp.data.domain.ProductDomainObject;
+import za.co.pp.data.dto.Product;
 import za.co.pp.data.entity.ProductEntity;
 import za.co.pp.data.mapper.ProductMapper;
 import za.co.pp.data.repository.ProductRepository;
@@ -26,5 +30,14 @@ public class ProductServiceImpl implements ProductService {
         final ProductEntity savedProductEntity = productRepository.save(productEntity);
 
         return productMapper.entityToDomainObject(savedProductEntity);
+    }
+
+    @Override
+    public List<ProductDomainObject> getAllProducts() {
+        List<ProductEntity> productEntities = this.productRepository.findAll();
+
+        return productEntities.stream()
+                .map(this.productMapper::entityToDomainObject)
+                .collect(Collectors.toList());
     }
 }

@@ -2,6 +2,7 @@ package za.co.pp.utils;
 
 import com.ninja_squad.dbsetup.operation.Operation;
 
+import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.Operations.sql;
 
 public class DbSetupCommonOperations {
@@ -15,6 +16,10 @@ public class DbSetupCommonOperations {
                     "product_id BIGINT AUTO_INCREMENT PRIMARY KEY," +
                     "name VARCHAR(50)," +
                     "price DECIMAL UNSIGNED," +
-                    "image VARBINARY);");
+                    "image MEDIUMBLOB);");
 
+    public static Operation INSERT_INTO_PRODUCTS_TABLE = insertInto("pretty_paradise.product")
+            .columns("product_id", "name", "price", "image")
+            .values(1, "Pink and Pretty", 20.00, new byte[100])
+            .values(2, "Purple and Pesky", 30.00, new byte[100]).build();
 }

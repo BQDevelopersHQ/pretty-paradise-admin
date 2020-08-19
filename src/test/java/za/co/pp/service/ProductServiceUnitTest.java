@@ -39,4 +39,11 @@ class ProductServiceUnitTest {
         verify(productRepository).save(any(ProductEntity.class));
     }
 
+    @Test
+    void canGetAllProducts() {
+        productService.getAllProducts();
+
+        verify(productRepository).findAll();
+    }
+
 }
