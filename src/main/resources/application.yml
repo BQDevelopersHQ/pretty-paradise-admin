@@ -2,3 +2,23 @@ server:
   port: 8001
   servlet:
     context-path: /prettyparadise
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+  datasource:
+    url: jdbc:mysql://localhost:3306/pretty_paradise
+    username: 'root'
+    password: 'pp_root'
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  application:
+    name: pretty-paradise-admin
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    instance-id: ${spring.application.name}
+

@@ -1,9 +1,6 @@
 package za.co.pp.utils;
 
-import java.io.FileNotFoundException;
-
 import com.ninja_squad.dbsetup.operation.Operation;
-import org.springframework.util.ResourceUtils;
 
 import static com.ninja_squad.dbsetup.Operations.sql;
 
