@@ -1,17 +1,14 @@
 package za.co.pp.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.co.pp.data.domain.ProductDomainObject;
-import za.co.pp.data.dto.Product;
 import za.co.pp.data.entity.ProductEntity;
 import za.co.pp.data.mapper.ProductMapper;
 import za.co.pp.data.repository.ProductRepository;
-import za.co.pp.exception.PrettyParadiseException;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -48,5 +45,14 @@ public class ProductServiceImpl implements ProductService {
         ProductEntity retrievedProductEntity = this.productRepository.getOne(id);
 
         return productMapper.entityToDomainObject(retrievedProductEntity);
+    }
+
+    @Override
+    public ProductDomainObject updateProduct(final ProductDomainObject updatedProductDomainObject, Long productId) {
+        ProductDomainObject oldProductDomainObject = this.getProductDomainObject(productId);
+        oldProductDomainObject.setName(updatedProductDomainObject.getName());
+        oldProductDomainObject.setPrice(updatedProductDomainObject.getPrice());
+        oldProductDomainObject.setImage(updatedProductDomainObject.getImage());
+        return this.saveProduct(oldProductDomainObject);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import za.co.pp.controller.validation.ProductValidation;
@@ -64,5 +65,22 @@ public class ProductControllerImpl implements ProductController {
         ProductDomainObject retrievedProductDomainObject = productService.getProductDomainObject(productId);
         Product retrievedProduct = productMapper.domainToDto(retrievedProductDomainObject);
         return new ResponseEntity<>(retrievedProduct, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Product> editProduct(final Long productId, MultiValueMap<String, String> updatedProduct, final MultipartFile image) {
+        productValidation.validateIdExists(productId);
+
+        final Product productDto = new Product();
+        productDto.setId(1L);
+        productDto.setName(updatedProduct.get("name").get(0));
+        productDto.setPrice(Double.parseDouble(updatedProduct.get("price").get(0)));
+        productDto.setImage(image);
+        ProductValidation.validateProduct(productDto);
+
+        ProductDomainObject updatedProductDomainObject = productService.updateProduct(this.productMapper.dtoToDomainObject(productDto), productId);
+        return new ResponseEntity<>(
+                productMapper.domainToDto(updatedProductDomainObject),
+                HttpStatus.CREATED);
     }
 }
