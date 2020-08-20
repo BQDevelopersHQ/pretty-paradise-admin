@@ -1,13 +1,16 @@
 package za.co.pp.controller;
 
 import javax.sql.DataSource;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Operation;
+import org.apache.commons.io.IOUtils;
 import org.hibernate.dialect.DB2Dialect;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,10 +25,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.multipart.MultipartFile;
 import za.co.pp.data.dto.Product;
+import za.co.pp.data.entity.ProductEntity;
+import za.co.pp.data.repository.ProductRepository;
 import za.co.pp.exception.PrettyParadiseException;
 
 import static com.ninja_squad.dbsetup.Operations.sequenceOf;
@@ -48,6 +55,9 @@ public class ProductControllerUnitTest {
 
     @Autowired
     private DataSource dataSource;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @BeforeEach
     void setup() {
@@ -114,6 +124,20 @@ public class ProductControllerUnitTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         return new HttpEntity<>(requestBody, headers);
+    }
+
+    @Test
+    @DisplayName("Given a product record exists with id 1, when put method called on /products/1, then the record is updated successfully")
+    void canUpdateProduct() throws Exception {
+        DbSetup dbSetup = new DbSetup(new DataSourceDestination(dataSource), INSERT_INTO_PRODUCTS_TABLE);
+        dbSetup.launch();
+
+        restTemplate.put("http://localhost:" + port + "/products/1", getValidRequest());
+
+        ProductEntity updatedProductEntity = this.productRepository.findById(1L).get();
+        assertThat(updatedProductEntity.getId()).isEqualTo(1L);
+        assertThat(updatedProductEntity.getName()).isEqualTo("Gray and Glitter");
+        assertThat(updatedProductEntity.getPrice()).isEqualTo(20.00);
     }
 
     private MultiValueMap<String, Object> getValidRequest() throws FileNotFoundException {

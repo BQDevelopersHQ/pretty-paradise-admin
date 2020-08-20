@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,6 +29,11 @@ public interface ProductController {
 
     @RequestMapping(value = "/products/{productId}", method = RequestMethod.GET)
     default ResponseEntity<Product> getProduct(@PathVariable Long productId){
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @RequestMapping(value = "/products/{productId}", method = RequestMethod.PUT)
+    default ResponseEntity<Product> editProduct(@PathVariable Long productId, @RequestParam MultiValueMap<String, String> updatedProduct, @RequestPart final MultipartFile image ){
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
