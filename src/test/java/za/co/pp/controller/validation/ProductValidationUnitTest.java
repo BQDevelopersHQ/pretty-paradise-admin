@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.ResourceUtils;
@@ -15,10 +16,14 @@ import za.co.pp.exception.PrettyParadiseException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
 @SpringBootTest
 class ProductValidationUnitTest {
+
+    @Autowired
+    private ProductValidation productValidation;
 
     @Test
     void canThrowExceptionIfNoPriceDefined() throws Exception {
@@ -103,6 +108,15 @@ class ProductValidationUnitTest {
         assertThatCode(() -> ProductValidation.validateProduct(productDto))
                 .doesNotThrowAnyException();
 
+    }
+
+    @Test
+    void canThrowExceptionIfGetProductOnInvalidId() {
+        assertThatThrownBy(() -> {
+            this.productValidation.validateIdExists(2L);
+        })
+                .isInstanceOf(PrettyParadiseException.class)
+                .hasMessage("The provided product id 2 does not exist");
     }
 
     private void validateAndAssertThrowsWithMessage(final Product productDto, String errorMessage) {

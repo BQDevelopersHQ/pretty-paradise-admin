@@ -10,4 +10,6 @@ public interface ProductService {
     ProductDomainObject saveProduct(ProductDomainObject productDomainObject);
 
     List<ProductDomainObject> getAllProducts();
+
+    ProductDomainObject getProductDomainObject(Long id);
 }

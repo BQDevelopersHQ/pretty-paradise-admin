@@ -20,14 +20,17 @@ import za.co.pp.service.ProductService;
 @CrossOrigin
 public class ProductControllerImpl implements ProductController {
 
+    private final ProductValidation productValidation;
+
     private final ProductMapper productMapper;
 
     private final ProductService productService;
 
     @Autowired
-    public ProductControllerImpl(ProductMapper productMapper, ProductService productService) {
+    public ProductControllerImpl(ProductMapper productMapper, ProductService productService, ProductValidation productValidation) {
         this.productService = productService;
         this.productMapper = productMapper;
+        this.productValidation = productValidation;
     }
 
     @Override
@@ -53,5 +56,13 @@ public class ProductControllerImpl implements ProductController {
                 .collect(Collectors.toList());
 
         return new ResponseEntity(products, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Product> getProduct(final Long productId) {
+        productValidation.validateIdExists(productId);
+        ProductDomainObject retrievedProductDomainObject = productService.getProductDomainObject(productId);
+        Product retrievedProduct = productMapper.domainToDto(retrievedProductDomainObject);
+        return new ResponseEntity<>(retrievedProduct, HttpStatus.OK);
     }
 }

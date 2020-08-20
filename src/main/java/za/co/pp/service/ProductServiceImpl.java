@@ -1,6 +1,7 @@
 package za.co.pp.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import za.co.pp.data.dto.Product;
 import za.co.pp.data.entity.ProductEntity;
 import za.co.pp.data.mapper.ProductMapper;
 import za.co.pp.data.repository.ProductRepository;
+import za.co.pp.exception.PrettyParadiseException;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -39,5 +41,12 @@ public class ProductServiceImpl implements ProductService {
         return productEntities.stream()
                 .map(this.productMapper::entityToDomainObject)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ProductDomainObject getProductDomainObject(final Long id) {
+        ProductEntity retrievedProductEntity = this.productRepository.getOne(id);
+
+        return productMapper.entityToDomainObject(retrievedProductEntity);
     }
 }
