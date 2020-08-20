@@ -1,7 +1,9 @@
 package za.co.pp.service;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -11,10 +13,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.util.ResourceUtils;
 import za.co.pp.data.domain.ProductDomainObject;
 import za.co.pp.data.entity.ProductEntity;
+import za.co.pp.data.mapper.ProductMapper;
 import za.co.pp.data.repository.ProductRepository;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class ProductServiceUnitTest {
@@ -24,6 +29,9 @@ class ProductServiceUnitTest {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ProductMapper productMapper;
 
     @Test
     void canSaveNewProduct() throws Exception {
@@ -44,6 +52,38 @@ class ProductServiceUnitTest {
         productService.getAllProducts();
 
         verify(productRepository).findAll();
+    }
+
+    @Test
+    void canGetProduct() throws Exception {
+        InputStream fileInputStream = new FileInputStream(ResourceUtils.getFile("classpath:images/test_image.jpeg"));
+        ProductEntity productEntity = getProductEntity(1L, "Pink and Pretty", 20.00, IOUtils.toByteArray(fileInputStream));
+        when(productRepository.getOne(any())).thenReturn(productEntity);
+
+        ProductDomainObject retrievedProductDomainObject =
+                this.productService.getProductDomainObject(1L); // valid product id returned by mock repo
+
+        ProductDomainObject expectedProductDomainObject = productMapper.entityToDomainObject(productEntity);
+        assertActualAndExpected(retrievedProductDomainObject, expectedProductDomainObject);
+    }
+
+    private void assertActualAndExpected(final ProductDomainObject retrievedProductDomainObject, final ProductDomainObject expectedProductDomainObject) {
+        assertThat(retrievedProductDomainObject).isNotNull();
+
+        assertThat(retrievedProductDomainObject.getId()).isEqualTo(expectedProductDomainObject.getId());
+        assertThat(retrievedProductDomainObject.getName()).isEqualTo(expectedProductDomainObject.getName());
+        assertThat(retrievedProductDomainObject.getPrice()).isEqualTo(expectedProductDomainObject.getPrice());
+        assertThat(Arrays.equals(retrievedProductDomainObject.getImage(), expectedProductDomainObject.getImage())).isTrue();
+    }
+
+
+    private ProductEntity getProductEntity(Long id, String name, Double price, byte[] image) throws IOException {
+        ProductEntity productEntity = new ProductEntity();
+        productEntity.setId(id);
+        productEntity.setPrice(price);
+        productEntity.setName(name);
+        productEntity.setImage(image);
+        return productEntity;
     }
 
 }

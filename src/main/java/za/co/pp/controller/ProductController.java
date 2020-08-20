@@ -26,4 +26,9 @@ public interface ProductController {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
+    @RequestMapping(value = "/products/{productId}", method = RequestMethod.GET)
+    default ResponseEntity<Product> getProduct(@PathVariable Long productId){
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
 }

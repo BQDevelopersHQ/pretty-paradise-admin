@@ -6,14 +6,25 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.tika.Tika;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import za.co.pp.data.dto.Product;
+import za.co.pp.data.repository.ProductRepository;
 import za.co.pp.exception.PrettyParadiseException;
 
+@Component
 public class ProductValidation {
 
+    private final ProductRepository productRepository;
+
     private static final List<String> ALLOWED_FILE_TYPES = Arrays.asList(MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE);
+
+    @Autowired
+    public ProductValidation(final ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
     public static void validateProduct(final Product productDto) {
         validateProductPrice(productDto.getPrice());
@@ -49,5 +60,10 @@ public class ProductValidation {
         if (productPrice < 0) {
             throw new PrettyParadiseException("A product cannot have a negative price.");
         }
+    }
+
+    public void validateIdExists(final Long productId) {
+        productRepository.findById(productId)
+                .orElseThrow( () -> new PrettyParadiseException(String.format("The provided product id %s does not exist", productId)));
     }
 }

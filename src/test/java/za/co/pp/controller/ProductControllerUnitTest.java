@@ -26,10 +26,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ResourceUtils;
 import za.co.pp.data.dto.Product;
+import za.co.pp.exception.PrettyParadiseException;
 
 import static com.ninja_squad.dbsetup.Operations.sequenceOf;
 import static com.ninja_squad.dbsetup.Operations.sql;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static za.co.pp.utils.DbSetupCommonOperations.CREATE_SCHEMA;
 import static za.co.pp.utils.DbSetupCommonOperations.CREATE_TABLE_PRODUCT;
 import static za.co.pp.utils.DbSetupCommonOperations.DROP_SCHEMA;
