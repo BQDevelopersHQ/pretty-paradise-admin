@@ -26,13 +26,12 @@ public class ProductValidation {
         this.productRepository = productRepository;
     }
 
-    public static void validateProduct(final Product productDto) {
+    public static void validateProductDetails(final Product productDto) {
         validateProductPrice(productDto.getPrice());
         validateProductName(productDto.getName());
-        validateProductImage(productDto.getImage());
     }
 
-    private static void validateProductImage(final MultipartFile image) {
+    public static void validateProductImage(final MultipartFile image) {
         final Tika tika = new Tika();
         try {
             String mimeType = tika.detect(image.getBytes());

@@ -36,12 +36,11 @@ class ProductMapperUnitTest {
 
     @Test
     void canMapFromDtoToDomainObject() throws Exception {
-        Product productDto = createProductDto();
+        Product productDto = createProductDetailsDto();
 
         ProductDomainObject productDomainObject = productMapper.dtoToDomainObject(productDto);
 
         assertDtoAndDomainObjectMapping(productDto, productDomainObject);
-        assertThat(productDomainObject.getImage()).isNotEmpty();
     }
 
     @Test
@@ -84,12 +83,11 @@ class ProductMapperUnitTest {
         return IOUtils.toByteArray(inputStreamFile);
     }
 
-    private Product createProductDto() throws IOException {
+    private Product createProductDetailsDto() throws IOException {
         Product productDto = new Product();
         productDto.setId(1L);
         productDto.setName("Gray and Glitter");
         productDto.setPrice(20.00);
-        productDto.setImage(createMultipartFile());
         return productDto;
     }
 

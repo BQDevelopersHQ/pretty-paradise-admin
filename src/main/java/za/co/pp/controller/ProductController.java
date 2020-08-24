@@ -18,7 +18,7 @@ import za.co.pp.data.dto.Product;
 public interface ProductController {
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
-    default ResponseEntity<Product> createNewProduct(@RequestParam final MultiValueMap<String, String> productDetails, @RequestPart final MultipartFile image) {
+    default ResponseEntity<Product> createNewProduct(@RequestPart(value = "productDetails") Product product, @RequestPart(value = "productImage") MultipartFile productImage) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -32,8 +32,13 @@ public interface ProductController {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @RequestMapping(value = "/products/{productId}", method = RequestMethod.PUT)
-    default ResponseEntity<Product> editProduct(@PathVariable Long productId, @RequestParam MultiValueMap<String, String> updatedProduct, @RequestPart final MultipartFile image ){
+    @RequestMapping(value = "/products/{productId}/details", method = RequestMethod.PUT)
+    default ResponseEntity<Product> editProductDetails(@PathVariable Long productId, @RequestPart(value = "productDetails") Product updatedProductDetails){
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @RequestMapping(value = "/products/{productId}/image", method = RequestMethod.PUT)
+    default ResponseEntity<Product> editProductImage(@PathVariable Long productId, @RequestPart(value = "productImage") MultipartFile updatedProductImage){
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

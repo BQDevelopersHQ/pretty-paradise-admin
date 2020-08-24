@@ -6,9 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import za.co.pp.controller.validation.ProductValidation;
@@ -35,16 +33,13 @@ public class ProductControllerImpl implements ProductController {
     }
 
     @Override
-    public ResponseEntity<Product> createNewProduct(final MultiValueMap<String, String> productDetails, final MultipartFile image) {
-        final Product productDto = new Product();
-        productDto.setName(productDetails.get("name").get(0));
-        productDto.setPrice(Double.parseDouble(productDetails.get("price").get(0)));
-        productDto.setImage(image);
+    public ResponseEntity<Product> createNewProduct(final Product product, final MultipartFile productImage) {
+        ProductValidation.validateProductDetails(product);
+        ProductValidation.validateProductImage(productImage);
 
-        ProductValidation.validateProduct(productDto);
-        final ProductDomainObject productDomainObject = productMapper.dtoToDomainObject(productDto);
+        final ProductDomainObject productDomainObject = productMapper.dtoToDomainObject(product);
 
-        final ProductDomainObject savedProductDomainObject = productService.saveProduct(productDomainObject);
+        final ProductDomainObject savedProductDomainObject = productService.saveProduct(productDomainObject, productImage);
         return new ResponseEntity<>(productMapper.domainToDto(savedProductDomainObject), HttpStatus.CREATED);
     }
 
@@ -68,19 +63,23 @@ public class ProductControllerImpl implements ProductController {
     }
 
     @Override
-    public ResponseEntity<Product> editProduct(final Long productId, MultiValueMap<String, String> updatedProduct, final MultipartFile image) {
+    public ResponseEntity<Product> editProductDetails(final Long productId, final Product updatedProductDetails) {
         productValidation.validateIdExists(productId);
-
-        final Product productDto = new Product();
-        productDto.setId(1L);
-        productDto.setName(updatedProduct.get("name").get(0));
-        productDto.setPrice(Double.parseDouble(updatedProduct.get("price").get(0)));
-        productDto.setImage(image);
-        ProductValidation.validateProduct(productDto);
-
-        ProductDomainObject updatedProductDomainObject = productService.updateProduct(this.productMapper.dtoToDomainObject(productDto), productId);
+        ProductValidation.validateProductDetails(updatedProductDetails);
+        ProductDomainObject updatedProductDetailsDomainObject = this.productMapper.dtoToDomainObject(updatedProductDetails);
+        ProductDomainObject savedProductDetailsDomainObject = productService.updateProductDetails(updatedProductDetailsDomainObject, productId);
         return new ResponseEntity<>(
-                productMapper.domainToDto(updatedProductDomainObject),
+                productMapper.domainToDto(savedProductDetailsDomainObject),
+                HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<Product> editProductImage(final Long productId, final MultipartFile updatedProductImage) {
+        productValidation.validateIdExists(productId);
+        ProductValidation.validateProductImage(updatedProductImage);
+        ProductDomainObject savedUpdatedProductDetailsDomainObject = productService.updateProductImage(updatedProductImage, productId);
+        return new ResponseEntity<>(
+                productMapper.domainToDto(savedUpdatedProductDetailsDomainObject),
                 HttpStatus.CREATED);
     }
 }
