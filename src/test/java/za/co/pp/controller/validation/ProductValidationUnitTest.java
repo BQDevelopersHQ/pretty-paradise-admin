@@ -1,10 +1,14 @@
 package za.co.pp.controller.validation;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.ninja_squad.dbsetup.DbSetup;
+import com.ninja_squad.dbsetup.destination.DataSourceDestination;
+import com.ninja_squad.dbsetup.operation.Operation;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,104 +18,114 @@ import org.springframework.web.multipart.MultipartFile;
 import za.co.pp.data.dto.Product;
 import za.co.pp.exception.PrettyParadiseException;
 
+import static com.ninja_squad.dbsetup.Operations.sequenceOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
+import static za.co.pp.utils.DbSetupCommonOperations.CREATE_SCHEMA;
+import static za.co.pp.utils.DbSetupCommonOperations.CREATE_TABLE_PRODUCT;
+import static za.co.pp.utils.DbSetupCommonOperations.DROP_SCHEMA;
 
 @SpringBootTest
 class ProductValidationUnitTest {
+
+    @Autowired
+    private DataSource dataSource;
 
     @Autowired
     private ProductValidation productValidation;
 
     @Test
     void canThrowExceptionIfNoPriceDefined() throws Exception {
-        Product productDto = createValidProductDto();
+        Product productDto = createValidProductDetailsDto();
         productDto.setPrice(null);
 
-        validateAndAssertThrowsWithMessage(productDto, "A product needs to have a price.");
+        validateProductDetailsAndAssertThrowsWithMessage(productDto, "A product needs to have a price.");
     }
 
-    private Product createValidProductDto() throws IOException {
+    private Product createValidProductDetailsDto() throws IOException {
         Product productDto = new Product();
         productDto.setName("Gray and Glitter");
-        productDto.setImage(createMultipartFile());
         productDto.setPrice(20.00);
         return productDto;
     }
 
     @Test
     void canThrowExceptionIfPriceAttributeIsNegative() throws Exception {
-        Product productDto = createValidProductDto();
+        Product productDto = createValidProductDetailsDto();
         productDto.setPrice(-1.00);
 
-        validateAndAssertThrowsWithMessage(productDto, "A product cannot have a negative price.");
+        validateProductDetailsAndAssertThrowsWithMessage(productDto, "A product cannot have a negative price.");
     }
 
     @Test
     void canThrowExceptionIfNameAttributeIsNull() throws Exception {
-        Product productDto = createValidProductDto();
+        Product productDto = createValidProductDetailsDto();
         productDto.setName(null);
 
-        validateAndAssertThrowsWithMessage(productDto, "A product must have a name.");
+        validateProductDetailsAndAssertThrowsWithMessage(productDto, "A product must have a name.");
     }
 
     @Test
-    void canThrowExceptionIfImageIsNotJpeg() throws Exception {
-        Product productDto = createValidProductDto();
-
+    void canThrowExceptionIfImageIsNotJpeg() {
         MultipartFile multipartFile = new MockMultipartFile("image", "Hello World".getBytes());
-        productDto.setImage(multipartFile);
 
-        validateAndAssertThrowsWithMessage(productDto,
-                "An image of file type text/plain has been provided, accepted types: image/jpeg, image/png");
+        try {
+            ProductValidation.validateProductImage(multipartFile);
+            fail("An invalid product image was passed, a PrettyParadiseException was expected.");
+        } catch (PrettyParadiseException e) {
+            assertThat(e.getMessage()).isEqualToIgnoringCase("An image of file type text/plain has been provided, accepted types: image/jpeg, image/png");
+        }
     }
 
     @Test
     void doesNotThrowExceptionWhenImageIsOfTypePng() throws Exception {
-        Product productDto = createValidProductDto();
-
         InputStream inputStream = new FileInputStream(ResourceUtils.getFile("classpath:images/test_image.png"));
         MultipartFile multipartFile = new MockMultipartFile("test_image", inputStream);
 
-        productDto.setImage(multipartFile);
-
-        assertThatCode(() -> ProductValidation.validateProduct(productDto))
+        assertThatCode(() -> ProductValidation.validateProductImage(multipartFile))
                 .doesNotThrowAnyException();
 
     }
 
     @Test
     void doesNotThrowExceptionWhenImageIsOfTypeJpeg() throws Exception {
-        Product productDto = createValidProductDto();
+        InputStream inputStream = new FileInputStream(ResourceUtils.getFile("classpath:images/test_image.jpeg"));
+        MultipartFile multipartFile = new MockMultipartFile("test_image", inputStream);
 
-        assertThatCode(() -> ProductValidation.validateProduct(productDto))
+        assertThatCode(() -> ProductValidation.validateProductImage(multipartFile))
                 .doesNotThrowAnyException();
     }
 
     @Test
     void doesNotThrowExceptionWhenImageIsOfTypeJpg() throws Exception {
-        Product productDto = createValidProductDto();
-
         InputStream inputStream = new FileInputStream(ResourceUtils.getFile("classpath:images/test_image.jpg"));
         MultipartFile multipartFile = new MockMultipartFile("test_image", inputStream);
 
-        assertThatCode(() -> ProductValidation.validateProduct(productDto))
+        assertThatCode(() -> ProductValidation.validateProductImage(multipartFile))
                 .doesNotThrowAnyException();
     }
 
     @Test
     void doesNotThrowExceptionForAValidProductDto() throws Exception {
-        Product productDto = createValidProductDto();
+        Product productDto = createValidProductDetailsDto();
 
-        assertThatCode(() -> ProductValidation.validateProduct(productDto))
+        assertThatCode(() -> ProductValidation.validateProductDetails(productDto))
                 .doesNotThrowAnyException();
 
     }
 
     @Test
     void canThrowExceptionIfGetProductOnInvalidId() {
+        Operation operations = sequenceOf(
+                DROP_SCHEMA,
+                CREATE_SCHEMA,
+                CREATE_TABLE_PRODUCT
+        );
+        DbSetup dbSetup = new DbSetup(new DataSourceDestination(dataSource), operations);
+        dbSetup.launch();
+
         assertThatThrownBy(() -> {
             this.productValidation.validateIdExists(2L);
         })
@@ -119,19 +133,13 @@ class ProductValidationUnitTest {
                 .hasMessage("The provided product id 2 does not exist");
     }
 
-    private void validateAndAssertThrowsWithMessage(final Product productDto, String errorMessage) {
+    private void validateProductDetailsAndAssertThrowsWithMessage(final Product productDto, String errorMessage) {
         try {
-            ProductValidation.validateProduct(productDto);
+            ProductValidation.validateProductDetails(productDto);
             fail("An invalid attribute was provided, a PrettyParadiseException was expected.");
         } catch (PrettyParadiseException e) {
             assertThat(e.getMessage()).isEqualToIgnoringCase(errorMessage);
         }
-    }
-
-    private MultipartFile createMultipartFile() throws IOException {
-        File fileImage = ResourceUtils.getFile("classpath:images/test_image.jpeg");
-        InputStream inputStream = new FileInputStream(fileImage);
-        return new MockMultipartFile("test_image", inputStream);
     }
 
 }

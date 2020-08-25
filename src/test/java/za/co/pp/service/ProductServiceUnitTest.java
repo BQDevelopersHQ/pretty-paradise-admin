@@ -43,9 +43,9 @@ class ProductServiceUnitTest {
         productDomainObject.setPrice(20.00);
 
         InputStream fileInputStream = new FileInputStream(ResourceUtils.getFile("classpath:images/test_image.jpeg"));
-        productDomainObject.setImage(IOUtils.toByteArray(fileInputStream));
+        MultipartFile productImage  = new MockMultipartFile("test_image", "test_image.jpeg", MediaType.IMAGE_JPEG_VALUE, fileInputStream);
 
-        productService.saveProduct(productDomainObject);
+        productService.saveProduct(productDomainObject, productImage);
 
         verify(productRepository).save(any(ProductEntity.class));
     }
