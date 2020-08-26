@@ -1,6 +1,7 @@
 package za.co.pp.controller;
 
 import javax.sql.DataSource;
+import javax.xml.ws.Response;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,6 +25,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -137,6 +139,24 @@ class ProductControllerIntegrationTest {
         restTemplate.put("http://localhost:" + port + "/products/1/image", getValidProductImageUpdateRequest());
 
         assertRecordUpdatedWithNewImage(existingProductEntity);
+    }
+
+    @Test
+    @DisplayName("Given a product exists with id 1, " +
+            "when delete called in /products/1," +
+            "then the product record is removed and the response is 204 no content")
+    void canDeleteProduct(){
+        Operation operations = sequenceOf(
+                INSERT_INTO_PRODUCTS_TABLE
+        );
+        DbSetup dbSetup = new DbSetup(new DataSourceDestination(dataSource), operations);
+        dbSetup.launch();
+
+        ResponseEntity<Void> responseEntity = restTemplate.exchange("http://localhost:" + port + "/products/1", HttpMethod.DELETE, new HttpEntity<>(null), Void.class);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(this.productRepository.findById(1L)).isEmpty();
+
     }
 
     private void assertRecordUpdatedWithNewImage(final ProductEntity existingProductEntity) {

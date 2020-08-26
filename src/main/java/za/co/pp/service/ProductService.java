@@ -16,4 +16,6 @@ public interface ProductService {
     ProductDomainObject updateProductDetails(ProductDomainObject dtoToDomainObject, Long productId);
 
     ProductDomainObject updateProductImage(MultipartFile updatedProductImage, Long productId);
+
+    void deleteProduct(Long productId);
 }
