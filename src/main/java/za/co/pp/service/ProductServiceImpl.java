@@ -82,4 +82,9 @@ public class ProductServiceImpl implements ProductService {
         ProductEntity updatedProductEntity =  productRepository.save(this.productMapper.domainObjectToEntity(oldProductDomainObject));
         return this.productMapper.entityToDomainObject(updatedProductEntity);
     }
+
+    @Override
+    public void deleteProduct(final Long productId) {
+        this.productRepository.deleteById(productId);
+    }
 }

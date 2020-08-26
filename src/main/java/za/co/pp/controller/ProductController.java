@@ -42,4 +42,9 @@ public interface ProductController {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
+    @RequestMapping(value = "/products/{productId}", method = RequestMethod.DELETE)
+    default ResponseEntity<Void> deleteProduct(@PathVariable Long productId){
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
 }
