@@ -82,4 +82,11 @@ public class ProductControllerImpl implements ProductController {
                 productMapper.domainToDto(savedUpdatedProductDetailsDomainObject),
                 HttpStatus.CREATED);
     }
+
+    @Override
+    public ResponseEntity<Void> deleteProduct(final Long productId) {
+        productValidation.validateIdExists(productId);
+        this.productService.deleteProduct(productId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

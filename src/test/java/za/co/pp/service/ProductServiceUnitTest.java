@@ -1,11 +1,17 @@
 package za.co.pp.service;
 
+import javax.sql.DataSource;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import com.ninja_squad.dbsetup.DbSetup;
+import com.ninja_squad.dbsetup.Operations;
+import com.ninja_squad.dbsetup.destination.DataSourceDestination;
+import com.ninja_squad.dbsetup.operation.Operation;
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,11 +24,17 @@ import za.co.pp.data.domain.ProductDomainObject;
 import za.co.pp.data.entity.ProductEntity;
 import za.co.pp.data.mapper.ProductMapper;
 import za.co.pp.data.repository.ProductRepository;
+import za.co.pp.utils.DbSetupCommonOperations;
 
+import static com.ninja_squad.dbsetup.Operations.sequenceOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static za.co.pp.utils.DbSetupCommonOperations.CREATE_SCHEMA;
+import static za.co.pp.utils.DbSetupCommonOperations.CREATE_TABLE_PRODUCT;
+import static za.co.pp.utils.DbSetupCommonOperations.DROP_SCHEMA;
+import static za.co.pp.utils.DbSetupCommonOperations.INSERT_INTO_PRODUCTS_TABLE;
 
 @SpringBootTest
 class ProductServiceUnitTest {
@@ -35,6 +47,9 @@ class ProductServiceUnitTest {
 
     @Autowired
     private ProductMapper productMapper;
+
+    @Autowired
+    private DataSource dataSource;
 
     @Test
     void canSaveNewProduct() throws Exception {
