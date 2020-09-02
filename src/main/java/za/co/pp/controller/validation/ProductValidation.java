@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,30 +40,30 @@ public class ProductValidation {
                 throw new PrettyParadiseException(
                         String.format("An image of file type %s has been provided, accepted types: %s",
                                 mimeType,
-                                String.join(", ", ALLOWED_FILE_TYPES)));
+                                String.join(", ", ALLOWED_FILE_TYPES)), HttpStatus.BAD_REQUEST);
             }
         } catch (IOException e) {
-            throw new PrettyParadiseException(e.getMessage(), e);
+            throw new PrettyParadiseException(e.getMessage(), e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
 
     private static void validateProductName(final String productName) {
         Optional.ofNullable(productName)
-                .orElseThrow(() -> new PrettyParadiseException("A product must have a name."));
+                .orElseThrow(() -> new PrettyParadiseException("A product must have a name.", HttpStatus.BAD_REQUEST));
     }
 
     private static void validateProductPrice(final Double productPrice) {
         Optional.ofNullable(productPrice)
-                .orElseThrow(() -> new PrettyParadiseException("A product needs to have a price."));
+                .orElseThrow(() -> new PrettyParadiseException("A product needs to have a price.", HttpStatus.BAD_REQUEST));
 
         if (productPrice < 0) {
-            throw new PrettyParadiseException("A product cannot have a negative price.");
+            throw new PrettyParadiseException("A product cannot have a negative price.", HttpStatus.BAD_REQUEST);
         }
     }
 
     public void validateIdExists(final Long productId) {
         productRepository.findById(productId)
-                .orElseThrow( () -> new PrettyParadiseException(String.format("The provided product id %s does not exist", productId)));
+                .orElseThrow( () -> new PrettyParadiseException(String.format("The provided product id %s does not exist", productId), HttpStatus.BAD_REQUEST));
     }
 }

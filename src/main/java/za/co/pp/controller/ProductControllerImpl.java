@@ -70,7 +70,7 @@ public class ProductControllerImpl implements ProductController {
         ProductDomainObject savedProductDetailsDomainObject = productService.updateProductDetails(updatedProductDetailsDomainObject, productId);
         return new ResponseEntity<>(
                 productMapper.domainToDto(savedProductDetailsDomainObject),
-                HttpStatus.CREATED);
+                HttpStatus.OK);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class ProductControllerImpl implements ProductController {
         ProductDomainObject savedUpdatedProductDetailsDomainObject = productService.updateProductImage(updatedProductImage, productId);
         return new ResponseEntity<>(
                 productMapper.domainToDto(savedUpdatedProductDetailsDomainObject),
-                HttpStatus.CREATED);
+                HttpStatus.OK);
     }
 
     @Override
