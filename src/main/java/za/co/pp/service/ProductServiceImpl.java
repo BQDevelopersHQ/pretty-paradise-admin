@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import za.co.pp.data.domain.ProductDomainObject;
@@ -41,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
         try {
             productEntity.setImage(productImage.getBytes());
         } catch (IOException e){
-            throw new PrettyParadiseException(e.getMessage(), e);
+            throw new PrettyParadiseException(e.getMessage(), e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return productEntity;
     }
@@ -77,7 +78,7 @@ public class ProductServiceImpl implements ProductService {
         try{
             oldProductDomainObject.setImage(updatedProductImage.getBytes());
         }catch (IOException e){
-            throw new PrettyParadiseException(e.getMessage(), e);
+            throw new PrettyParadiseException(e.getMessage(), e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         ProductEntity updatedProductEntity =  productRepository.save(this.productMapper.domainObjectToEntity(oldProductDomainObject));
         return this.productMapper.entityToDomainObject(updatedProductEntity);
